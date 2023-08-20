@@ -9,25 +9,40 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.q66zrl2.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.q66zrl2.mongodb.net/?retryWrites=true&w=majority`;
+const uri = "mongodb+srv://rasheduzzamanreshad:8sprwaQyKgU4sM5b@cluster0.n5u1omq.mongodb.net/";
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
 
+
+// mongodb+srv://rasheduzzamanreshad:8sprwaQyKgU4sM5b@cluster0.n5u1omq.mongodb.net/
+
 const run = async () => {
   try {
-    const db = client.db("jobbox");
-    const userCollection = db.collection("user");
-    const jobCollection = db.collection("job");
+    // const db = client.db("jobboxDb");
+    // const userCollection = db.collection("user");
+    // const jobCollection = db.collection("job");
+
+    const userCollection = client.db("jobboxDb").collection("user");
+    const jobCollection = client.db("jobboxDb").collection("job");
 
     app.post("/user", async (req, res) => {
-      const user = req.body;
+      try {
+        const user = req.body;
+        console.log(user);
 
-      const result = await userCollection.insertOne(user);
+        const result = await userCollection.insertOne(user);
+        res.status(200).json({ success: true, data: result });
 
-      res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: "An error occurred" });
+      }
+
+
     });
 
     app.get("/user/:email", async (req, res) => {
@@ -146,6 +161,24 @@ const run = async () => {
 
       res.send({ status: true, data: result });
     });
+
+    app.get('/search/:key', async (req, res) => {
+      try {
+        const searchText = req.params.key;
+        const query = {
+          "$or": [
+            { position: { $regex: searchText, $options: 'i' } },
+            // { description: { $regex: searchText, $options: 'i' } },
+          ],
+        };
+        const result = await jobCollection.find(query).toArray();
+        res.status(200).json({ success: true, data: result });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: "An error occurred" });
+      }
+    });
+
   } finally {
   }
 };
@@ -153,7 +186,7 @@ const run = async () => {
 run().catch((err) => console.log(err));
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Database Connection Successfully..!");
 });
 
 app.listen(port, () => {
