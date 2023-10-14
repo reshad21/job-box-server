@@ -10,7 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 // const uri = process.env.DB_URL;
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.n5u1omq.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.gplljg9.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = "mongodb+srv://reshad:8lEh1VXhe5LOuQne@cluster0.gplljg9.mongodb.net/?retryWrites=true&w=majority";
 
 const client = new MongoClient(uri, {
   serverApi: {
